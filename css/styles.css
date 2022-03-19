@@ -11,8 +11,40 @@
     align-items: center;
 }
 
+#calculator{
+    width: 800px;
+    height: 500px;
+    background-color:darkgrey;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid white;
+}
+
+#calculator-screen{
+    background-color: darkgreen;
+    width: 85%;
+    height: 80px;
+    margin: 10px 0;
+    font-size: 40px;
+    text-align: right;
+}
+
 #calculator-body{
-    width: 60%;
+    width: 85%;
     height: 400px;
-    background-color: white;
+    border: 1px solid gray;
+    display: flex;
+}
+
+#number-pad{
+    width: 60%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#operator-pad{
+    width: 40%;
+    display: flex;
+    flex-wrap: wrap;
 }
