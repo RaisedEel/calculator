@@ -26,8 +26,17 @@
     width: 85%;
     height: 80px;
     margin: 10px 0;
-    font-size: 40px;
     text-align: right;
+}
+
+#upper-screen{
+    height: 40%;
+    font-size: 20px;
+}
+
+#lower-screen{
+    height: 60%;
+    font-size: 40px;
 }
 
 #calculator-body{
