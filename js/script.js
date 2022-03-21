@@ -14,9 +14,11 @@ function createPad(padId, dataForButtons, porcentageLength){
         if(Array.isArray(data)){
             button.style.width = porcentageLength * data[1] + "%";
             button.textContent = data[0];
+            button.id = data[0];
         }else{
             button.style.width = porcentageLength + "%";
             button.textContent = data;
+            button.id = data;
         }
 
         if(button.textContent === "DEL"){
@@ -51,23 +53,25 @@ function pushedNumber(){
 }
 
 function pushedOperator(){
-    if(!operator){
-        upperScreen.textContent = `${lowerScreen.textContent} ${this.textContent} `;
-        operator = this.textContent;
-        firstNumber = Number(lowerScreen.textContent);
-        lowerScreen.textContent = "0";
-    }else{
-        secondNumber = Number(lowerScreen.textContent);
-        firstNumber = operate(firstNumber, operator, secondNumber);
-        operator = this.textContent;
-        upperScreen.textContent = `${firstNumber} ${operator} `;
-        lowerScreen.textContent = firstNumber;
-        clear = true;
+    if(!lowerScreen.textContent.includes("ERROR")){
+        if(!operator){
+            upperScreen.textContent = `${lowerScreen.textContent} ${this.textContent} `;
+            operator = this.textContent;
+            firstNumber = Number(lowerScreen.textContent);
+            lowerScreen.textContent = "0";
+        }else{
+            secondNumber = Number(lowerScreen.textContent);
+            firstNumber = operate(firstNumber, operator, secondNumber);
+            operator = this.textContent;
+            upperScreen.textContent = `${firstNumber} ${operator} `;
+            lowerScreen.textContent = firstNumber;
+            clear = true;
+        }
     }
 }
 
 function pushedEquals(){
-    if(operator && firstNumber !== null){
+    if(operator && firstNumber !== null && !lowerScreen.textContent.includes("ERROR")){
         secondNumber = Number(lowerScreen.textContent);
         lowerScreen.textContent = operate(firstNumber, operator, secondNumber);
         upperScreen.textContent += `${secondNumber} = `;
@@ -90,11 +94,13 @@ function pushedNegate(){
 }
 
 function pushedDelete(){
-    lowerScreen.textContent = lowerScreen.textContent.slice(0,-1);
-    if(lowerScreen.textContent === ""){
-        lowerScreen.textContent = "0";
+    if(!lowerScreen.textContent.includes("ERROR")){
+        lowerScreen.textContent = lowerScreen.textContent.slice(0,-1);
+        if(lowerScreen.textContent === ""){
+            lowerScreen.textContent = "0";
+        }
+        clear = false;
     }
-    clear = false;
 }
 
 function clearScreen(){
@@ -117,5 +123,24 @@ function operate(num1,operator,num2){
             break;
     }
 
-    return result;
+    return isNaN(result) ? "ERROR: Invalid Operation": result;
 }
+
+window.addEventListener("keydown", event =>{
+    switch(event.key){
+        case "Backspace": document.getElementById("DEL").click();
+            break;
+        case "c": document.getElementById("CLEAR").click();
+            break;
+        case "Enter": document.getElementById("=").click();
+            break;
+        case "n": document.getElementById("+/-").click();
+            break;
+        default:
+            const button = document.getElementById(event.key);
+            if(button){
+                button.click();
+            }
+            break;
+    }
+});
