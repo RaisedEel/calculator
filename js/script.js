@@ -1,4 +1,4 @@
-createPad("number-pad", [7,8,9,4,5,6,1,2,3,0,[".",2]], "30");
+createPad("number-pad", [7,8,9,4,5,6,1,2,3,0,".","+/-"], "30");
 createPad("operator-pad",["DEL","CLEAR","*","/","+","-",["=",2]], "45");
 
 const upperScreen = document.getElementById("upper-screen")
@@ -28,7 +28,9 @@ function createPad(padId, dataForButtons, porcentageLength){
         }else if(!isNaN(button.textContent)){
             button.addEventListener("click", pushedNumber);
         }else if(button.textContent === "."){
-            button.addEventListener("click", pusheDot);
+            button.addEventListener("click", pushedDot);
+        }else if(button.textContent === "+/-"){
+            button.addEventListener("click", pushedNegate);
         }else{
             button.addEventListener("click", pushedOperator);
         }
@@ -39,7 +41,7 @@ function createPad(padId, dataForButtons, porcentageLength){
 
 function pushedNumber(){
     if(lowerScreen.textContent.length < 12){
-        if(lowerScreen.textContent === "0" || clear){
+        if(lowerScreen.textContent === "0" || lowerScreen.textContent === "-0" || clear){
             lowerScreen.textContent = this.textContent;
             clear = false;
         }else{
@@ -73,9 +75,17 @@ function pushedEquals(){
     }
 }
 
-function pusheDot(){
+function pushedDot(){
     if(!lowerScreen.textContent.includes(".")){
         lowerScreen.textContent += ".";
+    }
+}
+
+function pushedNegate(){
+    if(!lowerScreen.textContent.includes("-")){
+        lowerScreen.textContent = "-" + lowerScreen.textContent;
+    }else{
+        lowerScreen.textContent = lowerScreen.textContent.replace("-","");
     }
 }
 
