@@ -1,4 +1,4 @@
-createPad("number-pad", [9,8,7,6,5,4,3,2,1,0], "30");
+createPad("number-pad", [7,8,9,4,5,6,1,2,3,0,[".",2]], "30");
 createPad("operator-pad",["DEL","CLEAR","*","/","+","-",["=",2]], "45");
 
 const upperScreen = document.getElementById("upper-screen")
@@ -10,6 +10,7 @@ function createPad(padId, dataForButtons, porcentageLength){
 
     for(const data of dataForButtons){
         const button = document.createElement("button");
+        
         if(Array.isArray(data)){
             button.style.width = porcentageLength * data[1] + "%";
             button.textContent = data[0];
@@ -17,49 +18,49 @@ function createPad(padId, dataForButtons, porcentageLength){
             button.style.width = porcentageLength + "%";
             button.textContent = data;
         }
-        button.addEventListener("click", () =>{
-            if(button.textContent === "DEL"){
-                lowerScreen.textContent = lowerScreen.textContent.slice(0,-1);
-                if(lowerScreen.textContent === ""){
-                    lowerScreen.textContent = "0";
-                }
-                clear = false;
-            }else if(button.textContent === "CLEAR"){
-                clearScreen();
-            }else if(button.textContent === "="){
-                pushedEquals();
-            }else if(!isNaN(button.textContent)){
-                pushedNumber(button.textContent);
-            }else{
-                pushedOperator(button.textContent);
-            }
-        });
+
+        if(button.textContent === "DEL"){
+            button.addEventListener("click", pushedDelete);
+        }else if(button.textContent === "CLEAR"){
+            button.addEventListener("click", clearScreen);
+        }else if(button.textContent === "="){
+            button.addEventListener("click", pushedEquals);
+        }else if(!isNaN(button.textContent)){
+            button.addEventListener("click", pushedNumber);
+        }else if(button.textContent === "."){
+            button.addEventListener("click", pusheDot);
+        }else{
+            button.addEventListener("click", pushedOperator);
+        }
+
         pad.appendChild(button);
     }
 }
 
-function pushedOperator(buttonContent){
+function pushedNumber(){
+    if(lowerScreen.textContent.length < 12){
+        if(lowerScreen.textContent === "0" || clear){
+            lowerScreen.textContent = this.textContent;
+            clear = false;
+        }else{
+            lowerScreen.textContent += this.textContent;
+        }
+    }
+}
+
+function pushedOperator(){
     if(!operator){
-        upperScreen.textContent = `${lowerScreen.textContent} ${buttonContent} `;
-        operator = buttonContent;
+        upperScreen.textContent = `${lowerScreen.textContent} ${this.textContent} `;
+        operator = this.textContent;
         firstNumber = Number(lowerScreen.textContent);
         lowerScreen.textContent = "0";
     }else{
         secondNumber = Number(lowerScreen.textContent);
         firstNumber = operate(firstNumber, operator, secondNumber);
-        operator = buttonContent;
+        operator = this.textContent;
         upperScreen.textContent = `${firstNumber} ${operator} `;
         lowerScreen.textContent = firstNumber;
         clear = true;
-    }
-}
-
-function pushedNumber(buttonContent){
-    if(lowerScreen.textContent === "0" || clear){
-        lowerScreen.textContent = buttonContent;
-        clear = false;
-    }else{
-        lowerScreen.textContent += buttonContent;
     }
 }
 
@@ -72,6 +73,20 @@ function pushedEquals(){
     }
 }
 
+function pusheDot(){
+    if(!lowerScreen.textContent.includes(".")){
+        lowerScreen.textContent += ".";
+    }
+}
+
+function pushedDelete(){
+    lowerScreen.textContent = lowerScreen.textContent.slice(0,-1);
+    if(lowerScreen.textContent === ""){
+        lowerScreen.textContent = "0";
+    }
+    clear = false;
+}
+
 function clearScreen(){
     upperScreen.textContent = "";
     lowerScreen.textContent = "0";
@@ -82,11 +97,11 @@ function operate(num1,operator,num2){
     let result = 0;
 
     switch(operator){
-        case "+": result = num1 + num2;
+        case "+": result = Math.round((num1 + num2 + Number.EPSILON) * 100) / 100;
             break; 
-        case "-": result = num1 - num2;
+        case "-": result = Math.round((num1 - num2 + Number.EPSILON) * 100) / 100;
             break;
-        case "*": result = num1 * num2;
+        case "*": result = Math.round((num1 * num2 + Number.EPSILON) * 100) / 100;
             break;
         case "/": result = Math.round((num1 / num2 + Number.EPSILON) * 100) / 100;
             break;
